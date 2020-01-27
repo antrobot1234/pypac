@@ -22,7 +22,7 @@ class pos:
         return pos(self.x + other.x, self.y + other.y)
 
     def mult(self, i: int):
-        return pos(self.x * i.x, self.y * i)
+        return pos(self.x * i, self.y * i)
 
     def flip(self, mirror):
         return pos(mirror.x - (self.x - mirror.x), mirror.y - (self.y - mirror.y))
@@ -71,6 +71,7 @@ class entity:
         return out
 
     def getPos(self, pacPos: pos, pacDir: str, otPos: pos) -> pos:
+        if(self.chomped):return pos(9,8)
         if (self.name == "r"): return pacPos
         if (self.name == "p"): return pacPos.sum(posMap.get(pacDir).mult(4))
         if (self.name == "b"): return otPos.flip(pacPos.sum(posMap.get(pacDir).pacPos.mult(2)))
@@ -93,10 +94,12 @@ class entity:
                 continue
             if gmc(self.pos.sum(posMap.get(look))) == ' ': remove.append(look)
         return [x for x in dirs if x not in remove]
+    def step(self,pacPos:pos,pacDir:str,otPos:pos):
+        self.pos = self.getDir(self.getPos(pacPos,pacDir,otPos),self.getValid())
 
 
 class state:
-    def __init(self, list):
+    def __init(self, list:list):
         self.entities = list
 
     def validate(self) -> bool:
@@ -104,6 +107,13 @@ class state:
         for e in self.entities:
             if gmc(e.pos) == " ": return False
             if(e.turnt and not e.vuln):return False
-            if e.type=="y":
+            if e.name=="y":
                 for e2 in [x for x in self.entities if x != e]:
                     if e.pos.equal(e2.pos):return False
+    def step(self):
+        e: entity
+        for e in self.entities:
+            if(e.name=="y"):self.pac = e
+            if(e.name=="b"):self.blue = e
+        for e in self.entities:
+            e.step(self.pac.pos,self.pac.dir,self.blue.pos)
