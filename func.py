@@ -1,119 +1,55 @@
-import math as m
-
+import pickle
 import mazeReader
-from random import choice
-import math
+import numpy as np
+
+from posClass import pos
+from stateClass import stateHolder
 
 maze = mazeReader.read()
-
-
-class pos:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def __str__(self):
-        return "{" + str(self.x) + "," + str(self.y) + "}"
-
-    def distance(self, other):
-        return (abs(other.x - self.x) ** 2) + (abs(other.y - self.y) ** 2)
-
-    def sum(self, other):
-        return pos(self.x + other.x, self.y + other.y)
-
-    def mult(self, i: int):
-        return pos(self.x * i, self.y * i)
-
-    def flip(self, mirror):
-        return pos(mirror.x - (self.x - mirror.x), mirror.y - (self.y - mirror.y))
-    def equal(self,other):
-        return self.x==other.x and self.y==other.y
-
 
 posMap = {"u": pos(0, -1), "d": pos(0, 1), "l": pos(-1, 0), "r": pos(1, 0)}
 
 
-def gmc(pos: pos):
+def gmc(pos: pos)->str:
     return maze[pos.y][pos.x]
 
 
-def opp(dir: str):
-    if dir == "u": return "d"
-    if dir == "d": return "u"
-    if dir == "l": return "r"
-    if dir == "r": return "l"
+xMax = 18
+yMax = 19
+oneKey = {'u':0,'l':1,'d':2,'r':3}
+
+def oneHot(values):
+    val = [0 for x in range(16)]
+    for x in range(len(values)):
+        val[x*4+oneKey.get(values[x])] = 1
+    return val
 
 
-class entity:
-    def __init__(self, x, y, n, d: str, tr: bool, vl: bool, ch: bool):
-        self.pos = pos(x, y)
-        self.name = n
-        self.dir = d
-        self.turnt = tr
-        self.vuln = vl
-        self.chomped = False
-
-    def lookDist(self, pos: pos, dir: str) -> float:
-        return self.pos.sum(posMap.get(dir)).distance(pos)
-
-    def getDir(self, pos: pos, validDirs: list):
-        out = ""
-        size = None
-        if (self.vuln): return choice(list)
-        for look in validDirs:
-            if size is None:
-                size = self.lookDist(pos, look)
-                out = look
-                continue
-            elif size > self.lookDist(pos, look):
-                size = self.lookDist(pos, look)
-                out = look
-        return out
-
-    def getPos(self, pacPos: pos, pacDir: str, otPos: pos) -> pos:
-        if(self.chomped):return pos(9,8)
-        if (self.name == "r"): return pacPos
-        if (self.name == "p"): return pacPos.sum(posMap.get(pacDir).mult(4))
-        if (self.name == "b"): return otPos.flip(pacPos.sum(posMap.get(pacDir).pacPos.mult(2)))
-        if (self.name == "o"):
-            if (math.sqrt(pacPos.distance(self.pos)) > 8.0):
-                return pacPos
-            else:
-                return pos(0, 20)
-        else:
-            return self.pos.sum(posMap.get(self.dir))
-
-    def getValid(self):
-        dirs = ["u", "l", "d", "r"]
-        remove = []
-        if gmc(self.pos.sum(posMap.get(opp(self.dir)))) == ' ': return [""]
-        if (self.turnt): return [].append(opp(self.dir))
-        for look in dirs:
-            if (opp(look) == self.dir):
-                remove.append(look)
-                continue
-            if gmc(self.pos.sum(posMap.get(look))) == ' ': remove.append(look)
-        return [x for x in dirs if x not in remove]
-    def step(self,pacPos:pos,pacDir:str,otPos:pos):
-        self.pos = self.getDir(self.getPos(pacPos,pacDir,otPos),self.getValid())
-
-
-class state:
-    def __init(self, list:list):
-        self.entities = list
-
-    def validate(self) -> bool:
-        e: entity
-        for e in self.entities:
-            if gmc(e.pos) == " ": return False
-            if(e.turnt and not e.vuln):return False
-            if e.name=="y":
-                for e2 in [x for x in self.entities if x != e]:
-                    if e.pos.equal(e2.pos):return False
-    def step(self):
-        e: entity
-        for e in self.entities:
-            if(e.name=="y"):self.pac = e
-            if(e.name=="b"):self.blue = e
-        for e in self.entities:
-            e.step(self.pac.pos,self.pac.dir,self.blue.pos)
+def saveStateRange(r:int,s:str):
+    objList = []
+    i=0
+    for _ in range(r):
+        h = stateHolder()
+        objList.append([h.inMatrix(),h.outMatrix()])
+        if i%1000==0:
+            print(r-i)
+        i+=1
+    fh = open(s,"wb")
+    pickle.dump(objList,fh,protocol=4)
+    fh.close()
+def readStateRange(s:str):
+    fh = open(s,"rb")
+    obj = pickle.load(fh)
+    return obj
+def seperate(inList:list):
+    oL = []
+    oLL = []
+    for entry in inList:
+        oL.append(entry[0])
+        oLL.append(entry[1])
+    return np.array(oL),np.array(oLL)
+retrain = False
+if retrain:
+    saveStateRange(10000,"dataout.txt")
+    saveStateRange(10000,"testout.txt")
+#print(readStateRange("dataout.txt")[0][1])
