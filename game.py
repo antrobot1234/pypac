@@ -5,7 +5,7 @@ from posClass import opp,pos
 from random import  getrandbits
 import numpy as np
 isModel = bool(getrandbits(1))
-isModel = Truex
+isModel = True
 if isModel:
     from tensorflow import keras
     model = keras.models.load_model("model.h5")
