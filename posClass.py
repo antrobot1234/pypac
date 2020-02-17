@@ -1,6 +1,6 @@
 from random import randrange
 
-from func import posMap, maze
+from func import maze
 
 
 class pos:
@@ -30,9 +30,14 @@ class pos:
         return self.x==other.x and self.y == other.y
     def inRange(self):
         return 0 <= self.x <= 18
+    def wrap(self):
+        if(self.x<0):return pos(18,self.y)
+        elif(self.x>18):return pos(0,self.y)
+        else:return self
     def asArr(self):
         return [self.x,self.y]
 
+posMap = {"u": pos(0, -1), "d": pos(0, 1), "l": pos(-1, 0), "r": pos(1, 0)}
 
 def genRandPos():
     y = randrange(1,len(maze)-1)
@@ -51,3 +56,5 @@ def opp(d: str):
     if d == "l": return "r"
     if d == "r": return "l"
     else:return d
+
+

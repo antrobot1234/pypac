@@ -1,8 +1,21 @@
 import numpy as np
 
-from entityClass import genRandEntities, entity
-from func import gmc, xMax, yMax, oneHot
+from entityClass import entity, entityBuild, gmc
+from func import xMax, yMax, oneHot
+from posClass import genRandPos
 
+def genRandEntities():
+    nameList = ["r","p","o","b"]
+    objList = []
+    objList.append(entityBuild(genRandPos(), "y", "x", randDir=True))
+    for name in nameList:
+        exit = False
+        pos = None
+        while not exit:
+            pos = genRandPos()
+            if(pos!=objList[0].pos):exit=True
+        objList.append(entityBuild(pos, name, "x", randDir=True))
+    return objList
 
 class state:
     def __init__(self, l=None):
@@ -67,3 +80,8 @@ class stateHolder:
         for x in self.output.values():
             val.append(x)
         return np.array(oneHot(val))
+stat = stateHolder()
+print(stat.output)
+print(stat.outMatrix())
+
+

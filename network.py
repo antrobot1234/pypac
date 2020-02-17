@@ -27,8 +27,8 @@ test_images, test_labels = func.seperate(test_data)
 #print(len(train_labels),len(train_images))
 #print(len(test_labels),len(test_images))
 #print(len(train_labels[0]))
-print(train_labels)
-
+#print(train_labels)
+print(train_data[0][0])
 model = keras.Sequential(
     [keras.layers.Flatten(input_shape=(5,2)),
      keras.layers.Dense(10,activation="relu"),
@@ -37,6 +37,12 @@ model = keras.Sequential(
 model.compile(optimizer='adam',loss="binary_crossentropy",metrics=["accuracy"])
 
 model.fit(train_images,train_labels,epochs=2)
-test_loss,test_acc = model.evaluate(test_images,test_labels)
-print(test_acc)
+'''test_loss,test_acc = model.evaluate(test_images,test_labels)
+print(test_acc)'''
+print(test_images[0])
+testData = np.array(test_images[0])
+out = np.expand_dims(testData,0)
+print(out)
+print(model.predict(out))
+#model.save("model.h5")'''
 #todo fuckin, .7500? methinks something is wrong with the data generator

@@ -2,17 +2,7 @@ import pickle
 import mazeReader
 import numpy as np
 
-from posClass import pos
-from stateClass import stateHolder
-
 maze = mazeReader.read()
-
-posMap = {"u": pos(0, -1), "d": pos(0, 1), "l": pos(-1, 0), "r": pos(1, 0)}
-
-
-def gmc(pos: pos)->str:
-    return maze[pos.y][pos.x]
-
 
 xMax = 18
 yMax = 19
@@ -24,6 +14,7 @@ def oneHot(values):
         val[x*4+oneKey.get(values[x])] = 1
     return val
 
+#from stateClass import stateHolder
 
 def saveStateRange(r:int,s:str):
     objList = []
